@@ -15,9 +15,8 @@ var (
 
 //func getInput(input map[int][][]int) (output map[int][][]int) {
 func getInput() {
-
-	//f, err := os.Open("../input.txt")
-	f, err := os.Open("../test_input.txt")
+	f, err := os.Open("../input.txt")
+	//f, err := os.Open("../test_input.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,12 +32,21 @@ func getInput() {
 		//fmt.Printf("org coordinates: %v\n", coord)
 		coordPath := makePath(coord)
 		if len(coordPath) > 0 {
-			fmt.Printf("makes: %v\n", coordPath)
+			fmt.Printf("made: %v %T\n", coordPath, coordPath)
+			fmt.Println("<---------------------------------------->")
 			for _, xy := range coordPath {
-				key := strconv.Itoa(xy[0]) + strconv.Itoa(xy[1])
-				ansmap[key]++
-			}
+				key := strconv.Itoa(xy[0]) + "-" + strconv.Itoa(xy[1])
+				_, ok := ansmap[key]
+				if ok {
+					ansmap[key] = ansmap[key] + 1
+				} else {
+					ansmap[key] = 1
+				}
 
+			}
+			//	} else {
+			//		fmt.Printf("made: %v\n", coordPath)
+			//		fmt.Println("<---------------------------------------->")
 		}
 	}
 
@@ -63,19 +71,20 @@ func getCoordinates(xys []string) (pathCoord [][]int) {
 
 func makePath(xys [][]int) (path [][]int) {
 	x1 := xys[0][0]
-	x2 := xys[1][0]
 	y1 := xys[0][1]
+	x2 := xys[1][0]
 	y2 := xys[1][1]
 	path = make([][]int, 0)
 	xyTmp := make([]int, 0)
+
 	if x1 == x2 {
 		if y1 > y2 {
-			// 2,2 -> 2,1
+			// 2,2 -> 2,1 works
 			for i := y1; i > y2-1; i-- {
 				xyTmp = append(xyTmp, i)
 			}
-		} else {
-			// 7,0 -> 7,4
+		} else if y1 < y2 {
+			// 7,0 -> 7,4 works
 			for i := y1; i < y2+1; i++ {
 				xyTmp = append(xyTmp, i)
 			}
@@ -90,8 +99,8 @@ func makePath(xys [][]int) (path [][]int) {
 			for i := x1; i > x2-1; i-- {
 				xyTmp = append(xyTmp, i)
 			}
-		} else {
-			// 0,9 -> 5,9
+		} else if x1 < x2 {
+			// 0,9 -> 5,9 works
 			for i := x1; i < x2+1; i++ {
 				xyTmp = append(xyTmp, i)
 			}
@@ -100,9 +109,47 @@ func makePath(xys [][]int) (path [][]int) {
 			// add all the x values
 			path = append(path, []int{val, y1})
 		}
-
+	} else if x1 > x2 {
+		if y1 > y2 {
+			// 9,9 -> 6,6
+			y := y1
+			for x := x1; x > x2-1; x-- {
+				//for y := y1; y > y2-1; y-- {
+				path = append(path, []int{x, y})
+				y--
+				//	}
+			}
+		} else if y1 < y2 {
+			// 9,7 -> 7,9
+			y := y1
+			for x := x1; x > x2-1; x-- {
+				//	for y := y1; y < y2+1; y++ {
+				path = append(path, []int{x, y})
+				y++
+				//	}
+			}
+		}
+	} else if x1 < x2 {
+		if y1 > y2 {
+			// 6,9 -> 9,6
+			y := y1
+			for x := x1; x < x2+1; x++ {
+				//	for y := y1; y > y2-1; y-- {
+				path = append(path, []int{x, y})
+				y--
+				//}
+			}
+		} else if y1 < y2 {
+			// 1,1 -> 3,3
+			y := y1
+			for x := x1; x < x2+1; x++ {
+				//	for y := y1; y < y2+1; y++ {
+				path = append(path, []int{x, y})
+				y++
+				//}
+			}
+		}
 	}
-
 	return path
 }
 
